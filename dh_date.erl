@@ -33,9 +33,9 @@
 -type minute()   :: 0..59.
 -type second()   :: 0..59.
 -type daynum()   :: 1..7.
--type t_date()     :: {year(),month(),day()}.
--type t_time()     :: {hour(),minute(),second()}.
--type t_datetime() :: {t_date(),t_time()}.
+-type date()     :: {year(),month(),day()}.
+-type time()     :: {hour(),minute(),second()}.
+-type datetime() :: {date(),time()}.
 
 %%
 %% EXPORTS
@@ -46,7 +46,7 @@
 format(Format) ->
     format(Format,calendar:local_time(),[]).
 
--spec format(string(),t_datetime()) -> string().
+-spec format(string(),datetime()) -> string().
 %% @doc format Date as Format
 format(Format, Date) ->
     format(Format, Date, []).
@@ -55,7 +55,7 @@ format(Format, Date) ->
 %% LOCAL FUNCTIONS
 %%
 
--spec format(string(),t_datetime(),list()) -> string().
+-spec format(string(),datetime(),list()) -> string().
 %% Finished, return
 format([], _Date, Acc) ->
     lists:flatten(lists:reverse(Acc));
@@ -100,7 +100,7 @@ format([$d|T], {{_,_,D},_}=Dt, Acc) ->
     format(T, Dt, [itol(D)|Acc]);
 format([$D|T], {Date,_}=Dt, Acc) ->
     io:format("~p",[Date]),
-    format(T, Dt, [sday(Date)|Acc]);
+    format(T, Dt, [sdayd(Date)|Acc]);
 format([$l|T], {Date,_}=Dt, Acc) ->
     format(T, Dt, [day(day_of_the_week(Date))|Acc]);
 format([$N|T], {Date,_}=Dt, Acc) ->
@@ -144,7 +144,7 @@ format([$c|T], {{Y,M,D},{H,Min,S}}=Dt, Acc) ->
     format(T, Dt, [Date|Acc]);
 format([$r|T], {{Y,M,D},{H,Min,S}}=Dt, Acc) ->
     Format = "~s, ~p ~s ~p ~2.10.0B:~2.10.0B:~2.10.0B",
-    Args   = [sday({Y,M,D}), D, smonth(M), Y, H, Min, S],
+    Args   = [sdayd({Y,M,D}), D, smonth(M), Y, H, Min, S],
     format(T, Dt, [io_lib:format(Format, Args)|Acc]);
 format([$U|T], Dt, Acc) ->
     Epoch = {{1970,1,1},{0,0,0}},
@@ -158,7 +158,7 @@ format([H|T], Date, Acc) ->
 
 
 %% @doc days in year
--spec days_in_year(t_date()) -> integer().
+-spec days_in_year(date()) -> integer().
 days_in_year({Y,_,_}=Date) -> 
     date_to_gregorian_days(Date) - 
         date_to_gregorian_days({Y,1,1}).
@@ -185,10 +185,13 @@ suffix(2) -> "nd";
 suffix(3) -> "rd";
 suffix(_) -> "th".
 
--spec sday(daynum()|t_date()) -> string().
+-spec sdayd(date()) -> string().
 %% @doc A textual representation of a day, three letters
-sday({Y,M,D}) -> 
-    sday(day_of_the_week({Y,M,D}));
+sdayd({Y,M,D}) -> 
+    sday(day_of_the_week({Y,M,D})).
+
+-spec sday(daynum()) -> string().
+%% @doc A textual representation of a day, three letters
 sday(1) -> "Mon";
 sday(2) -> "Tue";
 sday(3) -> "Wed";
@@ -238,7 +241,7 @@ month(10) -> "October";
 month(11) -> "November";
 month(12) -> "December".
 
--spec iso_week(t_date()) -> integer().
+-spec iso_week(date()) -> integer().
 %% @doc The week of the years as defined in ISO 8601
 %%      http://en.wikipedia.org/wiki/ISO_week_date
 iso_week(Date) ->
@@ -247,7 +250,7 @@ iso_week(Date) ->
         date_to_gregorian_days(Week),
     trunc((Days / 7) + 1).
 
--spec iso_year(t_date()) -> integer().
+-spec iso_year(date()) -> integer().
 %% @doc The year number as defined in ISO 8601
 %%      http://en.wikipedia.org/wiki/ISO_week_date
 iso_year({Y, _M, _D}=Dt) ->
@@ -264,7 +267,7 @@ iso_year({Y, _M, _D}=Dt) ->
             end
     end.
 
--spec iso_week_one(year()) -> t_date().
+-spec iso_week_one(year()) -> date().
 %% @doc The date of the the first day of the first week 
 %%      in the ISO calendar
 iso_week_one(Y) ->
