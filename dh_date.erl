@@ -159,12 +159,9 @@ format([H|T], Date, Acc) ->
 
 %% @doc days in year
 -spec days_in_year(t_date()) -> integer().
-days_in_year({_Y, 1, D}) -> D;
-days_in_year({Y, M, D})  -> to_z(Y, M, D).
-
-to_z(_Y, 1, Acc) -> Acc + 31;
-to_z(Y, M, Acc)  -> 
-    to_z(Y, M-1, Acc+last_day_of_the_month(Y, M)).
+days_in_year({Y,_,_}=Date) -> 
+    date_to_gregorian_days(Date) - 
+        date_to_gregorian_days({Y,1,1}).
 
 %% @doc is a leap year
 -spec is_leap(year()) -> 1|0.
@@ -286,6 +283,11 @@ pad2(X) ->
     io_lib:format("~2.10.0B",[X]).
 
 
+%%
+%% TEST FUNCTIONS
+%%
+%% c(dh_date,[{d,'TEST'}]).
+
 -define(DATE, {{2001,3,10},{17,16,17}}).
 -define(ISO,  "o \\WW").
 
@@ -307,7 +309,9 @@ basic_test() -> [
   ?assertEqual(format("H:m:s \\m \\i\\s \\m\\o\\n\\t\\h",?DATE),
                "17:03:17 m is month"),
   ?assertEqual(format("H:i:s",?DATE),
-               "17:16:17")
+               "17:16:17"),
+  ?assertEqual(format("z",?DATE),
+               "68")
 ].
 
 iso_test() -> [
