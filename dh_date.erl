@@ -44,7 +44,7 @@
 -spec format(string()) -> string().
 %% @doc format current local time as Format
 format(Format) ->
-    format(Format,calendar:local_time(),[]).
+    format(Format,calendar:universal_time(),[]).
 
 -spec format(string(),datetime()) -> string().
 %% @doc format Date as Format
