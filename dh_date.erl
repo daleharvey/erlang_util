@@ -36,7 +36,7 @@
 -type date()     :: {year(),month(),day()}.
 -type time()     :: {hour(),minute(),second()}.
 -type datetime() :: {date(),time()}.
-
+-type now()      :: {integer(),integer(),integer()}.
 %%
 %% EXPORTS
 %%
@@ -46,8 +46,10 @@
 format(Format) ->
     format(Format,calendar:universal_time(),[]).
 
--spec format(string(),datetime()) -> string().
+-spec format(string(),datetime() | now()) -> string().
 %% @doc format Date as Format
+format(Format, {_,_,_}=Now) ->
+    format(Format, calendar:now_to_datetime(Now), []);
 format(Format, Date) ->
     format(Format, Date, []).
 
