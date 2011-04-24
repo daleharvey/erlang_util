@@ -115,6 +115,9 @@ parse([Day,Month,Year,Hour,$:,Min,$:,Sec | PAM], _Now, _Opts)
 %% Mon Oct 30 20:12:06 +0000 2006
 parse([Month, Day, Hour, $:, Min, $:, Sec, _, 0, Year], _Now, _Opts) ->
     {{Year, Month, Day}, {Hour, Min, Sec}};
+%% Mon, 12 Sep 2006 19:36:04 +0000
+parse([_C, Day, Month, Year, Hour, $:, Min, $:, Sec, _, 0], _Now, _Opts) ->
+    {{Year, Month, Day}, {Hour, Min, Sec}};
 
 %% 2010-09-01T20:49:05
 parse([Year, $-, Month, $-, Day, {bad_token,84}, Hour, $:, Min, $:, Sec], _Now, _Opts) ->
