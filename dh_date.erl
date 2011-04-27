@@ -112,6 +112,19 @@ parse([Day,Month,Year,Hour,$:,Min,$:,Sec | PAM], _Now, _Opts)
   when ?is_meridian(PAM) ->
     {{Year, Month, Day}, {hour(Hour, PAM), Min, Sec}};
 
+%% Mon Oct 30 20:12:06 +0000 2006
+parse([Month, Day, Hour, $:, Min, $:, Sec, _, 0, Year], _Now, _Opts) ->
+    {{Year, Month, Day}, {Hour, Min, Sec}};
+%% Mon, 12 Sep 2006 19:36:04 +0000
+parse([_C, Day, Month, Year, Hour, $:, Min, $:, Sec, _, 0], _Now, _Opts) ->
+    {{Year, Month, Day}, {Hour, Min, Sec}};
+
+%% 2010-09-01T20:49:05
+parse([Year, $-, Month, $-, Day, {bad_token,84}, Hour, $:, Min, $:, Sec], _Now, _Opts) ->
+    {{Year, Month, Day}, {Hour, Min, Sec}};
+%% 2010-09-01T20:49:05.185Z
+parse([Year, $-, Month, $-, Day, {bad_token,84}, Hour, $:, Min, $:, Sec | _Rest], _Now, _Opts) ->
+    {{Year, Month, Day}, {Hour, Min, Sec}};
 
 parse(_Tokens, _Now, _Opts) ->
     {error, bad_date}.
@@ -152,6 +165,23 @@ tokenise("NOVEMBER"++Rest, Acc)  -> tokenise(Rest, [11 | Acc]);
 tokenise("NOV"++Rest, Acc)       -> tokenise(Rest, [11 | Acc]);
 tokenise("DECEMBER"++Rest, Acc)  -> tokenise(Rest, [12 | Acc]);
 tokenise("DEC"++Rest, Acc)       -> tokenise(Rest, [12 | Acc]);
+
+
+tokenise("MONDAY"++Rest, Acc)       -> tokenise(Rest, Acc);
+tokenise("MON"++Rest, Acc)       -> tokenise(Rest, Acc);
+tokenise("TUESDAY"++Rest, Acc)       -> tokenise(Rest, Acc);
+tokenise("TUE"++Rest, Acc)       -> tokenise(Rest, Acc);
+tokenise("WEDNESDAY"++Rest, Acc)       -> tokenise(Rest, Acc);
+tokenise("WED"++Rest, Acc)       -> tokenise(Rest, Acc);
+tokenise("THURSDAY"++Rest, Acc)       -> tokenise(Rest, Acc);
+tokenise("THU"++Rest, Acc)       -> tokenise(Rest, Acc);
+tokenise("FRIDAY"++Rest, Acc)       -> tokenise(Rest, Acc);
+tokenise("FRI"++Rest, Acc)       -> tokenise(Rest, Acc);
+tokenise("SATURDAY"++Rest, Acc)       -> tokenise(Rest, Acc);
+tokenise("SAT"++Rest, Acc)       -> tokenise(Rest, Acc);
+tokenise("SUNDAY"++Rest, Acc)       -> tokenise(Rest, Acc);
+tokenise("SUN"++Rest, Acc)       -> tokenise(Rest, Acc);
+
 
 tokenise([$: | Rest], Acc) -> tokenise(Rest, [ $: | Acc]);
 tokenise([$/ | Rest], Acc) -> tokenise(Rest, [ $/ | Acc]);
