@@ -450,7 +450,7 @@ ltoi(X) ->
 -define(DATE, {{2001,3,10},{17,16,17}}).
 -define(ISO,  "o \\WW").
 
-basic_format_test_() -> [                         
+basic_format_test_() -> [
   ?_assertEqual(format("F j, Y, g:i a",?DATE), "March 10, 2001, 5:16 pm"),
   ?_assertEqual(format("m.d.y",?DATE),         "03.10.01"),
   ?_assertEqual(format("j, n, Y",?DATE),       "10, 3, 2001"),
@@ -458,7 +458,7 @@ basic_format_test_() -> [
   ?_assertEqual(format("H:i:s",?DATE),          "17:16:17"),
   ?_assertEqual(format("z",?DATE),              "68"),
   ?_assertEqual(format("D M j G:i:s Y",?DATE), "Sat Mar 10 17:16:17 2001"),
-                         
+
   ?_assertEqual(format("h-i-s, j-m-y, it is w Day",?DATE),
                "05-16-17, 10-03-01, 1631 1617 6 Satpm01"),
   ?_assertEqual(format("\\i\\t \\i\\s \\t\\h\\e\\ jS \\d\\a\\y.",?DATE),
@@ -488,6 +488,8 @@ basic_parse_test_() -> [
                 parse("22 Aug 2008 6:35", ?DATE)),
   ?_assertEqual({{2008,8,22}, {18,35,17}},
                 parse("22 Aug 2008 6:35 PM", ?DATE)),
+  ?_assertEqual({{2008,8,22}, {6,35,12}},
+                parse("22.08.2008 6:35:12", ?DATE)),
   ?_assertEqual({{2001,3,10}, {11,15,17}},
                 parse("11:15", ?DATE)),
   ?_assertEqual({{2001,3,10}, {1,15,17}},
