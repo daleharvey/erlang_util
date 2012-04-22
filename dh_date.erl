@@ -14,6 +14,7 @@
 
 -module(dh_date).
 -author("Dale Harvey <dale@hypernumbers.com>").
+-author('Petrovsky Alexander, <askjuise@gmail.com>').
 
 -export([format/1, format/2]).
 -export([parse/1,  parse/2]).
@@ -79,7 +80,7 @@ do_parse(Date, Now, Opts) ->
                 false -> {error, bad_date}
             end;
         _ -> {error, bad_date}
-    end.              
+    end.
 
 %%
 %% LOCAL FUNCTIONS
@@ -124,6 +125,10 @@ parse([Year, $-, Month, $-, Day, {bad_token,84}, Hour, $:, Min, $:, Sec], _Now, 
     {{Year, Month, Day}, {Hour, Min, Sec}};
 %% 2010-09-01T20:49:05.185Z
 parse([Year, $-, Month, $-, Day, {bad_token,84}, Hour, $:, Min, $:, Sec | _Rest], _Now, _Opts) ->
+    {{Year, Month, Day}, {Hour, Min, Sec}};
+
+%% 22.04.2012 15:20:00
+parse([Day, $., Month, $., Year, 32, Hour, $:, Min, $:, Sec], _Now, _Opts) ->
     {{Year, Month, Day}, {Hour, Min, Sec}};
 
 parse(_Tokens, _Now, _Opts) ->
@@ -190,7 +195,7 @@ tokenise("AM"++Rest, Acc)  -> tokenise(Rest, [am | Acc]);
 tokenise("PM"++Rest, Acc)  -> tokenise(Rest, [pm | Acc]);
 
 tokenise([32 | Rest], Acc) -> tokenise(Rest, Acc);          % Spaces
-tokenise("TH"++Rest, Acc)  -> tokenise(Rest, Acc);         
+tokenise("TH"++Rest, Acc)  -> tokenise(Rest, Acc);
 tokenise("ND"++Rest, Acc)  -> tokenise(Rest, Acc);
 tokenise("ST"++Rest, Acc)  -> tokenise(Rest, Acc);
 tokenise("OF"++Rest, Acc)  -> tokenise(Rest, Acc);
