@@ -14,6 +14,7 @@
 
 -module(dh_date).
 -author("Dale Harvey <dale@hypernumbers.com>").
+-author('Petrovsky Alexander, <askjuise@gmail.com>').
 
 -export([format/1, format/2]).
 -export([parse/1,  parse/2]).
@@ -79,7 +80,7 @@ do_parse(Date, Now, Opts) ->
                 false -> {error, bad_date}
             end;
         _ -> {error, bad_date}
-    end.              
+    end.
 
 %%
 %% LOCAL FUNCTIONS
@@ -124,6 +125,10 @@ parse([Year, $-, Month, $-, Day, {bad_token,84}, Hour, $:, Min, $:, Sec], _Now, 
     {{Year, Month, Day}, {Hour, Min, Sec}};
 %% 2010-09-01T20:49:05.185Z
 parse([Year, $-, Month, $-, Day, {bad_token,84}, Hour, $:, Min, $:, Sec | _Rest], _Now, _Opts) ->
+    {{Year, Month, Day}, {Hour, Min, Sec}};
+
+%% 22.04.2012 15:20:00
+parse([Day, $., Month, $., Year, 32, Hour, $:, Min, $:, Sec], _Now, _Opts) ->
     {{Year, Month, Day}, {Hour, Min, Sec}};
 
 parse(_Tokens, _Now, _Opts) ->
@@ -190,7 +195,7 @@ tokenise("AM"++Rest, Acc)  -> tokenise(Rest, [am | Acc]);
 tokenise("PM"++Rest, Acc)  -> tokenise(Rest, [pm | Acc]);
 
 tokenise([32 | Rest], Acc) -> tokenise(Rest, Acc);          % Spaces
-tokenise("TH"++Rest, Acc)  -> tokenise(Rest, Acc);         
+tokenise("TH"++Rest, Acc)  -> tokenise(Rest, Acc);
 tokenise("ND"++Rest, Acc)  -> tokenise(Rest, Acc);
 tokenise("ST"++Rest, Acc)  -> tokenise(Rest, Acc);
 tokenise("OF"++Rest, Acc)  -> tokenise(Rest, Acc);
@@ -445,7 +450,7 @@ ltoi(X) ->
 -define(DATE, {{2001,3,10},{17,16,17}}).
 -define(ISO,  "o \\WW").
 
-basic_format_test_() -> [                         
+basic_format_test_() -> [
   ?_assertEqual(format("F j, Y, g:i a",?DATE), "March 10, 2001, 5:16 pm"),
   ?_assertEqual(format("m.d.y",?DATE),         "03.10.01"),
   ?_assertEqual(format("j, n, Y",?DATE),       "10, 3, 2001"),
@@ -453,7 +458,7 @@ basic_format_test_() -> [
   ?_assertEqual(format("H:i:s",?DATE),          "17:16:17"),
   ?_assertEqual(format("z",?DATE),              "68"),
   ?_assertEqual(format("D M j G:i:s Y",?DATE), "Sat Mar 10 17:16:17 2001"),
-                         
+
   ?_assertEqual(format("h-i-s, j-m-y, it is w Day",?DATE),
                "05-16-17, 10-03-01, 1631 1617 6 Satpm01"),
   ?_assertEqual(format("\\i\\t \\i\\s \\t\\h\\e\\ jS \\d\\a\\y.",?DATE),
@@ -483,6 +488,8 @@ basic_parse_test_() -> [
                 parse("22 Aug 2008 6:35", ?DATE)),
   ?_assertEqual({{2008,8,22}, {18,35,17}},
                 parse("22 Aug 2008 6:35 PM", ?DATE)),
+  ?_assertEqual({{2008,8,22}, {6,35,12}},
+                parse("22.08.2008 6:35:12", ?DATE)),
   ?_assertEqual({{2001,3,10}, {11,15,17}},
                 parse("11:15", ?DATE)),
   ?_assertEqual({{2001,3,10}, {1,15,17}},
